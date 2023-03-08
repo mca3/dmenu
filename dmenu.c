@@ -165,13 +165,24 @@ drawmenu(void)
 	int x = 0, y = 0, w;
 	char *censort;
 
+	if (fillprompt) {
+		y = (mh / 2) - (drw->fonts->h / 2);
+	}
+
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	drw_rect(drw, 0, 0, mw, mh, 1, 1);
 
 	if (prompt && *prompt) {
 		drw_setscheme(drw, scheme[SchemeSel]);
-		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0);
+		if (fillprompt) {
+			drw_rect(drw, 0, 0, promptw, mh, 1, 1);
+		}
+
+		x = drw_text(drw, x, y, promptw, bh, lrpad / 2, prompt, 0);
 	}
+
+	y = 0;
+
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
 	drw_setscheme(drw, scheme[SchemeNorm]);
@@ -823,6 +834,8 @@ main(int argc, char *argv[])
 			fstrstr = cistrstr;
 		} else if (!strcmp(argv[i], "-P"))   /* is the input a password */
 			passwd = 1;
+		else if (!strcmp(argv[i], "-F"))   /* fill prompt */
+			fillprompt ^= 1;
 		else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
